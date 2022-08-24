@@ -1,0 +1,28 @@
+[project]
+name = "ai"
+version = "0.0.1"
+authors = [
+  { name="Jay Hack", email="jayhack.0@gmail.com" },
+]
+description = "dev client library"
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/jayhack"
+
+[build-system]
+requires = [
+	"fastapi==0.79.0",
+	"uvicorn==0.18.2",
+	"requests~=2.28.1",
+	"pydantic~=1.9.1",
+	"setuptools>=61.0"
+]
+build-backend = "setuptools.build_meta"
