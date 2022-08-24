@@ -1,4 +1,6 @@
 from typing import Union
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 
 class ChannelInterface(object):
@@ -15,7 +17,7 @@ class SlackChannel(ChannelInterface):
 
     def send_message(self, content: Union[dict, str]):
         payload = content if type(content) is dict else {'text': content}
-        response = self._post('/message', {
+        json = {
             'agent_name': self.agent_name,
             'channel_name': self.name,
             'channel_id': self.id,
@@ -23,9 +25,12 @@ class SlackChannel(ChannelInterface):
             'payload': {
                 'text': content
             }
-        })
+        }
+        logging.info(f'[SlackChannel] Sending message: {json}')
+        response = self._post('/message', json)
         if response is not None:
-            print(f'Successfully sent message: {dict(payload)}')
+            logging.info(f'Successfully sent message: {dict(payload)}')
         else:
+            logging.info(f'')
             print(f'Error: {response}')
         return response

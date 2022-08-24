@@ -3,6 +3,8 @@ from typing import Union
 
 import requests
 
+logging.basicConfig(level=logging.DEBUG)
+
 
 class APIInterface(object):
     base_url: str

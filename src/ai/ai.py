@@ -15,6 +15,8 @@ from .utils.config import config
 from .utils.message import Message
 from .utils.model import Model
 
+logging.basicConfig(level=logging.DEBUG)
+
 all_channels = [SlackChannel]
 
 
@@ -134,40 +136,13 @@ class AI(APIInterface):
         self.channel_interfaces = {c.name: c for c in all_channels if self.has_channel(c.name)}
         return self.channels
 
-    # def __getattr__(self, item: str):
-    #     """allows for syntax like ai.slack.send_message"""
-    #     if self.has_channel(item):
-    #         return self.channel_interfaces[item]
-    #     return None
-
-    ####################################################################################################################
-    # MESSAGES
-    ####################################################################################################################
-
-    # def send_message(self, channel_name: str, payload: dict):
-    #     if not self.has_channel(channel_name):
-    #         raise Exception(f'Invalid channel: {channel_name}')
-    #     channel = self.get_channel(channel_name)
-    #     response = self._post('/message', {
-    #         'agent_name': self.name,
-    #         'channel_name': channel.name,
-    #         'channel_id': channel.id,
-    #         'channel': channel.__dict__(),
-    #         'payload': dict(payload)
-    #     })
-    #     if response is not None:
-    #         print(f'Successfully sent message: {dict(payload)}')
-    #     return response
-
     ####################################################################################################################
     # RUNNING
     ####################################################################################################################
 
     async def handle_trigger(self, input: TriggerInput):
         message = extract_message(input)
-        print('Before created task')
         asyncio.create_task(self.handler(message))
-        print('After created task')
         return {'status': 'success'}
 
     def start(self, handler, port=8080):
