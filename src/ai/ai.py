@@ -74,7 +74,7 @@ class AI(APIInterface):
             'channels': channels,
             'models': models
         }
-        self.base_url = f'{config["server_url"]}/agents/{self.name}'
+        self.base_url = f'{config["server_url"]}/agents'
         self._register()
 
     def _register(self):
