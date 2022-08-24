@@ -144,20 +144,20 @@ class AI(APIInterface):
     # MESSAGES
     ####################################################################################################################
 
-    def send_message(self, channel_name: str, payload: dict):
-        if not self.has_channel(channel_name):
-            raise Exception(f'Invalid channel: {channel_name}')
-        channel = self.get_channel(channel_name)
-        response = self._post('/message', {
-            'agent_name': self.name,
-            'channel_name': channel.name,
-            'channel_id': channel.id,
-            'channel': channel.__dict__(),
-            'payload': dict(payload)
-        })
-        if response is not None:
-            print(f'Successfully sent message: {dict(payload)}')
-        return response
+    # def send_message(self, channel_name: str, payload: dict):
+    #     if not self.has_channel(channel_name):
+    #         raise Exception(f'Invalid channel: {channel_name}')
+    #     channel = self.get_channel(channel_name)
+    #     response = self._post('/message', {
+    #         'agent_name': self.name,
+    #         'channel_name': channel.name,
+    #         'channel_id': channel.id,
+    #         'channel': channel.__dict__(),
+    #         'payload': dict(payload)
+    #     })
+    #     if response is not None:
+    #         print(f'Successfully sent message: {dict(payload)}')
+    #     return response
 
     ####################################################################################################################
     # RUNNING
