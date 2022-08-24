@@ -8,11 +8,11 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from utils.api_interface import APIInterface
-from src.utils.channel import Channel
+from utils.channel import Channel
 from channels.slack import ChannelInterface, SlackChannel
-from src.utils.config import config
-from src.utils.message import Message
-from src.utils.model import Model
+from utils.config import config
+from utils.message import Message
+from utils.model import Model
 
 all_channels = [SlackChannel]
 

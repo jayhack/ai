@@ -1,5 +1,5 @@
 from utils.api_interface import APIInterface
-from src.utils.config import config
+from utils.config import config
 
 
 class Channel(APIInterface):
