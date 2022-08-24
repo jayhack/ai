@@ -1,8 +1,8 @@
 from typing import Any
 
-from utils.api_interface import APIInterface
-from utils.config import config
-from utils.custom_types import ModelQuery
+from .api_interface import APIInterface
+from .config import config
+from .custom_types import ModelQuery
 
 
 class Model(APIInterface):

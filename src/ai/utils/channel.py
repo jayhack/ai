@@ -1,5 +1,5 @@
-from utils.api_interface import APIInterface
-from utils.config import config
+from .api_interface import APIInterface
+from .config import config
 
 
 class Channel(APIInterface):
