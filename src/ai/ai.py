@@ -1,3 +1,4 @@
+import logging
 import asyncio
 from typing import Dict
 from typing import List
@@ -51,6 +52,9 @@ async def healthcheck():
     return {'healthcheck': 'hello world!'}
 
 
+default_channels = ['slack']
+default_models = ['openai/gpt-3', 'stability-ai/stable-diffusion']
+
 class AI(APIInterface):
     """Main interface"""
     id: int
@@ -62,15 +66,31 @@ class AI(APIInterface):
     channel_interfaces: Dict[str, ChannelInterface]
     models: List[Model]
 
-    def init(self, name):
+    def init(self, name: str, url: str, channels: List[str] = default_channels, models: List[str] = default_models):
         self.name = name
+        self.init_data = {
+            'name': name,
+            'url': url,
+            'channels': channels,
+            'models': models
+        }
         self.base_url = f'{config["server_url"]}/agents/{self.name}'
         self._register()
 
     def _register(self):
-        data = self._get(f'/register')
+        data = self._post(f'/register', {
+            'name': self.name,
+            'url': self.init_data['url'],
+            'channels': self.init_data['channels'],
+            'models': self.init_data['models']
+        })
         if not data:
             raise Exception('Could not establish connection to server')
+        else:
+            if data['is_new']:
+                logging.info(f'Registered new agent: {self.name}')
+            else:
+                logging.info(f'Registered returning agent: {self.name}')
         self.id = data['agent']['id']
         self.models = [Model(m['id'], m['name'], self.name) for m in data['models']]
         self.channels = [Channel(c['id'], c['name'], self.name) for c in data['channels']]
