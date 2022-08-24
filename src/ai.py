@@ -7,12 +7,12 @@ from fastapi import APIRouter
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from api_interface import APIInterface
-from channel import Channel
+from utils.api_interface import APIInterface
+from src.utils.channel import Channel
 from channels.slack import ChannelInterface, SlackChannel
-from config import config
-from message import Message
-from model import Model
+from src.utils.config import config
+from src.utils.message import Message
+from src.utils.model import Model
 
 all_channels = [SlackChannel]
 

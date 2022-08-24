@@ -1,5 +1,5 @@
 """
-TODO: combine this file with the types.py from the client side
+TODO: combine this file with the custom_types.py from the client side
 """
 
 
