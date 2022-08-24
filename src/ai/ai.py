@@ -149,6 +149,7 @@ class AI(APIInterface):
             raise Exception(f'Invalid channel: {channel_name}')
         channel = self.get_channel(channel_name)
         response = self._post('/message', {
+            'agent_name': self.name,
             'channel_name': channel.name,
             'channel_id': channel.id,
             'channel': channel.__dict__(),
