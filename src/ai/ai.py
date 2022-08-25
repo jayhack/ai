@@ -97,6 +97,9 @@ class AI(APIInterface):
         self.models = [Model(m['id'], m['name'], self.name) for m in data['models']]
         self.channels = [Channel(c['id'], c['name'], self.name) for c in data['channels']]
         self.channel_interfaces = {c.name: c(self) for c in all_channels if self.has_channel(c.name)}
+        print('#####################################################')
+        print('# ', config['admin_url'].format(agent_name=self.name))
+        print('#####################################################')
 
     ####################################################################################################################
     # MODELS
