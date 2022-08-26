@@ -7,6 +7,7 @@ import uvicorn
 from fastapi import APIRouter
 from fastapi import FastAPI
 from pydantic import BaseModel
+from starlette.responses import RedirectResponse
 
 from .utils.api_interface import APIInterface
 from .utils.channel import Channel
@@ -48,6 +49,12 @@ def extract_message(t: TriggerInput) -> Message:
 app = FastAPI()
 router = APIRouter()
 
+
+@app.get('/')
+async def root():
+    return RedirectResponse(
+        url='https://devai.retool.com/apps/f63713ea-24bb-11ed-acd1-87525936f813/Dev%20App%20Home?_releaseVersion=latest'
+    )
 
 @app.get('/healthcheck')
 async def healthcheck():
