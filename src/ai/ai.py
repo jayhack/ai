@@ -53,7 +53,7 @@ router = APIRouter()
 @app.get('/')
 async def root():
     return RedirectResponse(
-        url='https://devai.retool.com/apps/f63713ea-24bb-11ed-acd1-87525936f813/Dev%20App%20Home?_releaseVersion=latest'
+        url='https://devai.retool.com/embedded/public/1c65ff6f-4485-489a-b151-205e635b7f7b#agent_name=reactify'
     )
 
 @app.get('/healthcheck')
