@@ -1,5 +1,4 @@
 import logging
-from slack import ChannelInterface
 from github import Github
 
 logging.basicConfig(level=logging.DEBUG)
@@ -11,7 +10,7 @@ def get_repos():
     """Get all repos for a user"""
     return g.get_user().get_repos()
 
-class GithubInterface(ChannelInterface):
+class GithubInterface(object):
     id = 4
     name = 'github'
 
