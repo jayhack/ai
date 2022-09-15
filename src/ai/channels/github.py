@@ -1,9 +1,15 @@
-from typing import Union
 import logging
 from slack import ChannelInterface
+from github import Github
 
 logging.basicConfig(level=logging.DEBUG)
 
+jays_secret_key = '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' # only works for me
+g = Github(jays_secret_key)
+
+def get_repos():
+    """Get all repos for a user"""
+    return g.get_user().get_repos()
 
 class GithubInterface(ChannelInterface):
     id = 4

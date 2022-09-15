@@ -11,6 +11,7 @@ from starlette.responses import RedirectResponse
 
 from .utils.api_interface import APIInterface
 from .utils.channel import Channel
+from .channels.github import g, GithubInterface
 from .channels.slack import ChannelInterface, SlackChannel
 from .utils.config import config
 from .utils.message import Message
@@ -91,6 +92,18 @@ class AI(APIInterface):
         print('#####################################################')
         print('# ', config['admin_url'].format(agent_name=self.name))
         print('#####################################################')
+
+    @property
+    def slack(self):
+        return self.channel_interfaces['slack']
+
+    @property
+    def github(self):
+        return self.channel_interfaces['github']
+
+    @property
+    def github_api(self):
+        return g
 
     ####################################################################################################################
     # MODELS
