@@ -49,18 +49,6 @@ def extract_message(t: TriggerInput) -> Message:
 app = FastAPI()
 router = APIRouter()
 
-
-@app.get('/')
-async def root():
-    return RedirectResponse(
-        url='https://devai.retool.com/embedded/public/1c65ff6f-4485-489a-b151-205e635b7f7b#agent_name=reactify'
-    )
-
-@app.get('/healthcheck')
-async def healthcheck():
-    return {'healthcheck': 'hello world!'}
-
-
 default_channels = ['slack']
 default_models = ['openai/gpt-3', 'stability-ai/stable-diffusion']
 
@@ -150,6 +138,15 @@ class AI(APIInterface):
     # RUNNING
     ####################################################################################################################
 
+    async def handle_healthcheck(self):
+        return {'healthcheck': 'hello world!'}
+
+    async def redirect_dashboard(self):
+        base_url = 'https://devai.retool.com/embedded/public/1c65ff6f-4485-489a-b151-205e635b7f7b'
+        return RedirectResponse(
+            url=f'{base_url}#agent_name={self.name}'
+        )
+
     async def handle_trigger(self, input: TriggerInput):
         message = extract_message(input)
         asyncio.create_task(self.handler(message))
@@ -158,6 +155,8 @@ class AI(APIInterface):
     def start(self, handler, port=8080):
         self.app = app
         self.handler = handler
+        router.add_api_route('/', endpoint=self.redirect_dashboard, methods=['GET'])
+        router.add_api_route('/healthcheck', endpoint=self.handle_healthcheck, methods=['GET'])
         router.add_api_route('/io', endpoint=self.handle_trigger, methods=['POST'])
         self.app.include_router(router)
         uvicorn.run(self.app, host="0.0.0.0", port=port)
