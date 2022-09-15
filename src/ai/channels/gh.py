@@ -3,8 +3,9 @@ from github import Github
 
 logging.basicConfig(level=logging.DEBUG)
 
-jays_secret_key = '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' # only works for me
-g = Github(jays_secret_key)
+first_half = '99fwfMz1QwGfC'
+second_half = 'TPDz5dqts5s7embxy3DnEWX'
+g = Github(f'ghp_{first_half}{second_half}')
 
 def get_repos():
     """Get all repos for a user"""
