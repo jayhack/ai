@@ -3,7 +3,7 @@ from github import Github
 
 logging.basicConfig(level=logging.DEBUG)
 
-jays_secret_key = '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' # only works for me
+jays_secret_key = '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' # only works for me
 g = Github(jays_secret_key)
 
 def get_repos():
