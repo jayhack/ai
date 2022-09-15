@@ -26,16 +26,12 @@ class ChannelInput(BaseModel):
     name: str
 
 
-class MessageBody(BaseModel):
-    text: str
-
-
 class TriggerInput(BaseModel):
     id: int
     timestamp: str
     channel: ChannelInput
     producer_id: int
-    body: MessageBody
+    body: Dict
 
 
 def extract_message(t: TriggerInput) -> Message:
@@ -49,7 +45,7 @@ def extract_message(t: TriggerInput) -> Message:
 app = FastAPI()
 router = APIRouter()
 
-default_channels = ['slack']
+default_channels = ['slack', 'github']
 default_models = ['openai/gpt-3', 'stability-ai/stable-diffusion']
 
 class AI(APIInterface):
