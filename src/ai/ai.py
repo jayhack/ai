@@ -11,7 +11,7 @@ from starlette.responses import RedirectResponse
 
 from .utils.api_interface import APIInterface
 from .utils.channel import Channel
-from .channels.github import g, GithubInterface
+from .channels.gh import g, GithubInterface
 from .channels.slack import ChannelInterface, SlackChannel
 from .utils.config import config
 from .utils.message import Message
