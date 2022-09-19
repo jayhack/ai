@@ -1,7 +1,7 @@
 import logging
 from github import Github
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 first_half = '99fwfMz1QwGfC'
 second_half = 'TPDz5dqts5s7embxy3DnEWX'

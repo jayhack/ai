@@ -1,7 +1,7 @@
 import logging
 from pyairtable import Api, Base, Table
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 AIRTABLE_API_KEY = 'keygxE02sLmHSebja'
 api = Api(AIRTABLE_API_KEY)
