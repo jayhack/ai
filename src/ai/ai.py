@@ -13,6 +13,7 @@ from .utils.api_interface import APIInterface
 from .utils.channel import Channel
 from .channels.gh import g, GithubInterface
 from .channels.slack import ChannelInterface, SlackChannel
+from .channels.airtable import AirtableInterface, api as airtable_api
 from .utils.config import config
 from .utils.message import Message
 from .utils.model import Model
@@ -46,7 +47,7 @@ def extract_message(t: TriggerInput) -> Message:
 app = FastAPI()
 router = APIRouter()
 
-default_channels = ['slack', 'github']
+default_channels = ['slack', 'github', 'airtable']
 default_models = ['openai/gpt-3', 'stability-ai/stable-diffusion']
 
 class AI(APIInterface):
@@ -104,6 +105,10 @@ class AI(APIInterface):
     @property
     def github_api(self):
         return g
+
+    @property
+    def airtable_api(self):
+        return airtable_api
 
     ####################################################################################################################
     # MODELS
