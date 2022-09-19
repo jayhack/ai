@@ -18,7 +18,7 @@ from .utils.config import config
 from .utils.message import Message
 from .utils.model import Model
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 all_channels = [SlackChannel]
 
