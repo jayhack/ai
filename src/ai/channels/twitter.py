@@ -16,7 +16,7 @@ class TwitterChannel(ChannelInterface):
         self._post = parent._post
         self.agent_name = parent.name
 
-    def reply(self, tweet_id: int, text: str, images: List[str]):
+    def reply(self, tweet_id: int, text: str, image_urls: List[str]):
         json = {
             'agent_name': self.agent_name,
             'channel_name': self.name,
@@ -25,7 +25,7 @@ class TwitterChannel(ChannelInterface):
             'payload': {
                 'tweet_id': tweet_id,
                 'text': text,
-                'images': images
+                'image_urls': image_urls
             }
         }
         logging.info(f'[TwitterChannel] Sending message: {json}')
