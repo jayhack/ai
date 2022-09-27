@@ -1,10 +1,12 @@
 import logging
-from pyairtable import Api, Base, Table
+
+from pyairtable import Api
 
 logging.basicConfig(level=logging.INFO)
 
 AIRTABLE_API_KEY = 'keygxE02sLmHSebja'
 api = Api(AIRTABLE_API_KEY)
+
 
 class AirtableInterface(object):
     id = 5

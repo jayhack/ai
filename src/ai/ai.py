@@ -1,5 +1,5 @@
-import logging
 import asyncio
+import logging
 from typing import Dict
 from typing import List
 
@@ -9,11 +9,12 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from starlette.responses import RedirectResponse
 
+from .channels.airtable import api as airtable_api
+from .channels.gh import g
+from .channels.notion import notion_api
+from .channels.slack import ChannelInterface, SlackChannel
 from .utils.api_interface import APIInterface
 from .utils.channel import Channel
-from .channels.gh import g, GithubInterface
-from .channels.slack import ChannelInterface, SlackChannel
-from .channels.airtable import AirtableInterface, api as airtable_api
 from .utils.config import config
 from .utils.message import Message
 from .utils.model import Model
@@ -47,8 +48,9 @@ def extract_message(t: TriggerInput) -> Message:
 app = FastAPI()
 router = APIRouter()
 
-default_channels = ['slack', 'github', 'airtable']
+default_channels = ['slack', 'github', 'airtable', 'notion']
 default_models = ['openai/gpt-3', 'stability-ai/stable-diffusion']
+
 
 class AI(APIInterface):
     """Main interface"""
@@ -105,6 +107,10 @@ class AI(APIInterface):
     @property
     def github_api(self):
         return g
+
+    @property
+    def notion_api(self):
+        return notion_api
 
     @property
     def airtable_api(self):
