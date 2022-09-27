@@ -11,7 +11,7 @@ from starlette.responses import RedirectResponse
 
 from .channels.airtable import api as airtable_api
 from .channels.gh import g
-from .channels.notion import notion_api
+# from .channels.notion import notion_api
 from .channels.slack import ChannelInterface, SlackChannel
 from .utils.api_interface import APIInterface
 from .utils.channel import Channel
@@ -108,9 +108,9 @@ class AI(APIInterface):
     def github_api(self):
         return g
 
-    @property
-    def notion_api(self):
-        return notion_api
+    # @property
+    # def notion_api(self):
+    #     return notion_api
 
     @property
     def airtable_api(self):
