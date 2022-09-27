@@ -10,7 +10,9 @@ src/ai.egg-info/top_level.txt
 src/ai/channels/__init__.py
 src/ai/channels/airtable.py
 src/ai/channels/gh.py
+src/ai/channels/notion.py
 src/ai/channels/slack.py
+src/ai/channels/twitter.py
 src/ai/utils/__init__.py
 src/ai/utils/api_interface.py
 src/ai/utils/channel.py
