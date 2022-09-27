@@ -13,6 +13,7 @@ from .channels.airtable import api as airtable_api
 from .channels.gh import g
 # from .channels.notion import notion_api
 from .channels.slack import ChannelInterface, SlackChannel
+from .channels.twitter import TwitterChannel
 from .utils.api_interface import APIInterface
 from .utils.channel import Channel
 from .utils.config import config
@@ -21,7 +22,7 @@ from .utils.model import Model
 
 logging.basicConfig(level=logging.INFO)
 
-all_channels = [SlackChannel]
+all_channels = [SlackChannel, TwitterChannel]
 
 
 class ChannelInput(BaseModel):
@@ -48,7 +49,7 @@ def extract_message(t: TriggerInput) -> Message:
 app = FastAPI()
 router = APIRouter()
 
-default_channels = ['slack', 'github', 'airtable', 'notion']
+default_channels = ['slack']
 default_models = ['openai/gpt-3', 'stability-ai/stable-diffusion']
 
 
@@ -103,6 +104,10 @@ class AI(APIInterface):
     @property
     def github(self):
         return self.channel_interfaces['github']
+
+    @property
+    def twitter(self):
+        return self.channel_interfaces['twitter']
 
     @property
     def github_api(self):
