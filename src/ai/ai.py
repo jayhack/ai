@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 from typing import Dict
 from typing import List
 
@@ -177,7 +178,15 @@ class AI(APIInterface):
         asyncio.create_task(self.handler(message))
         return {'status': 'success'}
 
-    def start(self, handler, port=8080):
+    def start(self, handler, port=8080, channels: List[str] = default_channels, models: List[str] = default_models):
+
+        # =====[ Initialization ]=====
+        app_name = os.environ['PYTHONPATH'].split('/')[3]
+        app_url = f'https://{app_name}.jayhack.repl.co'
+        self.init(app_name, app_url, channels=channels, models=models)
+        print(app_name, app_url)
+
+        # =====[ App setup ]=====
         self.app = app
         self.handler = handler
         router.add_api_route('/', endpoint=self.redirect_dashboard, methods=['GET'])
