@@ -1,3 +1,3 @@
-from ai import ai
+from core import ai
 
 __all__ = ['ai']
