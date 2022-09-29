@@ -50,7 +50,7 @@ def extract_message(t: TriggerInput) -> Message:
 app = FastAPI()
 router = APIRouter()
 
-default_channels = ['slack']
+default_channels = ['slack', 'twitter']
 default_models = ['openai/gpt-3', 'stability-ai/stable-diffusion']
 
 
