@@ -19,5 +19,5 @@ class APIInterface(object):
         response = requests.post(f'{self.base_url}{endpoint}', json=data)
         if response.status_code != 200:
             logging.info(f'_post Error: {response.content}')
-            return None
+            raise Exception(f'{response.content}')
         return response.json()
