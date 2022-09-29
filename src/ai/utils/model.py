@@ -20,7 +20,7 @@ class Model(APIInterface):
     def query(self, raw_query: Any, use_active_prompt=False, prompt_id=None) -> dict:
         query = ModelQuery(raw_query)
         d = query.to_dict()
-        d['model_id'] = self.id
+        d['model_name'] = self.name
         d['agent_id'] = self.agent_id
         d['use_active_prompt'] = use_active_prompt
         if prompt_id:
