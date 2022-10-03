@@ -2,6 +2,7 @@ README.md
 pyproject.toml
 src/__init__.py
 src/ai/__init__.py
+src/ai/app_id.py
 src/ai/core.py
 src/ai.egg-info/PKG-INFO
 src/ai.egg-info/SOURCES.txt

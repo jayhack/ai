@@ -3,27 +3,27 @@ from typing import Any
 from .api_interface import APIInterface
 from .config import config
 from .custom_types import ModelQuery
+from ..app_id import AppID
 
 
 class Model(APIInterface):
     id: int
     name: str
-    id: int
-    base_url: str
+    app_id: AppID
 
-    def __init__(self, id: int, name: str, agent_id: int):
+    def __init__(self, id: int, name: str, app_id: AppID):
         self.id = id
         self.name = name
-        self.agent_id = agent_id
-        self.base_url = f"{config['server_url']}/agents/models"
+        self.app_id = app_id
+        base_url = f"{config['server_url']}/agents/models"
+        super(Model, self).__init__(base_url, app_id)
 
     def query(self, raw_query: Any, use_active_prompt=False, prompt_id=None) -> dict:
-        query = ModelQuery(raw_query)
-        d = query.to_dict()
-        d['model_name'] = self.name
-        d['agent_id'] = self.agent_id
-        d['use_active_prompt'] = use_active_prompt
+        """TODO: Clean this up, better define ModelQuery relations etc."""
+        data = ModelQuery(raw_query).to_dict()
+        data['model_name'] = self.name
+        data['use_active_prompt'] = use_active_prompt
         if prompt_id:
-            d['prompt_id'] = prompt_id
-        response = self._post('/query', d)
+            data['prompt_id'] = prompt_id
+        response = self._post('/query', data)
         return response['payload']['result']  # This is way too long

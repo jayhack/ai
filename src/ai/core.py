@@ -3,6 +3,7 @@ import logging
 import os
 from typing import Dict
 from typing import List
+from typing import Tuple
 
 import uvicorn
 from fastapi import APIRouter
@@ -10,6 +11,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from starlette.responses import RedirectResponse
 
+from .app_id import AppID
 from .channels.airtable import api as airtable_api
 from .channels.gh import g
 # from .channels.notion import notion_api
@@ -50,14 +52,14 @@ def extract_message(t: TriggerInput) -> Message:
 app = FastAPI()
 router = APIRouter()
 
-default_channels = ['slack', 'twitter']
-default_models = ['openai/gpt-3', 'stability-ai/stable-diffusion']
+default_channels: List[Channel] = ['slack', 'twitter']
+default_models: List[Model] = ['openai/gpt-3', 'stability-ai/stable-diffusion']
 
 
 class AI(APIInterface):
     """Main interface"""
-    id: int
-    name: str
+    id: AppID
+    app_url: str
     base_url = config['server_url']
     app = None
     handler = None
@@ -65,38 +67,63 @@ class AI(APIInterface):
     channel_interfaces: Dict[str, ChannelInterface]
     models: List[Model]
 
-    def init(self, name: str, url: str, channels: List[str] = default_channels, models: List[str] = default_models):
-        self.name = name
-        self.init_data = {
-            'name': name,
-            'url': url,
-            'channels': channels,
-            'models': models
-        }
-        self.base_url = f'{config["server_url"]}/agents'
-        self._register()
+    ####################################################################################################################
+    # INITIALIZATION
+    ####################################################################################################################
 
-    def _register(self):
+    @classmethod
+    def is_local_dev(cls):
+        """Used for development; returns True if this is not on Replit"""
+        return 'REPL_OWNER' not in os.environ
+
+    @classmethod
+    def get_app_metadata(cls) -> Tuple[str, str, str]:
+        """Assumes Replit"""
+        if cls.is_local_dev():
+            return 'local_dev_username', 'local_dev_agentname', 'http://localhost:8081'
+        app_name = os.environ['PYTHONPATH'].split('/')[3]
+        user_name = os.environ['REPL_OWNER']
+        app_url = f'https://{app_name}.{user_name}.repl.co'
+        return app_name, user_name, app_url
+
+    def __init__(self):
+        app_name, user_name, self.app_url = self.get_app_metadata()
+        self.base_url = config['server_url'] + '/agents'
+        self.id = AppID(
+            user_name=user_name,
+            agent_name=app_name,
+            agent_id=None,
+            agent_instance_id=None
+        )
+        super(AI, self).__init__(self.base_url, self.id)
+
+    def register(self, channels: List[str], models: List[str]):
+        """Announces presence of this agent to the server"""
+        self.channels = channels or default_channels
+        self.models = models or default_models
         data = self._post(f'/register', {
-            'name': self.name,
-            'url': self.init_data['url'],
-            'channels': self.init_data['channels'],
-            'models': self.init_data['models']
+            'app_name': self.id.agent_name,
+            'user_name': self.id.user_name,
+            'url': self.app_url,
+            'channels': self.channels,
+            'models': self.models
         })
         if not data:
             raise Exception('Could not establish connection to server')
         else:
             if data['is_new']:
-                logging.info(f'Registered new agent: {self.name}')
+                logging.info(f'Registered new agent: {self.id.agent_name}')
             else:
-                logging.info(f'Registered returning agent: {self.name}')
-        self.id = data['agent']['id']
+                logging.info(f'Registered returning agent: {self.id.agent_name}')
+        self.id.agent_id = data['agent']['id']
+        self.id.instance_id = data['instance']['id']
         self.models = [Model(m['id'], m['name'], self.id) for m in data['models']]
-        self.channels = [Channel(c['id'], c['name'], self.name) for c in data['channels']]
+        self.channels = [Channel(c['id'], c['name'], self.id) for c in data['channels']]
         self.channel_interfaces = {c.name: c(self) for c in all_channels if self.has_channel(c.name)}
-        print('#####################################################')
-        print('# ', config['admin_url'].format(agent_name=self.name))
-        print('#####################################################')
+
+    ####################################################################################################################
+    # CHANNELS
+    ####################################################################################################################
 
     @property
     def slack(self):
@@ -136,7 +163,7 @@ class AI(APIInterface):
 
     def load_models(self) -> List[Model]:
         payload = self._get('/models')
-        self.models = [Model(m['id'], m['name'], self.name) for m in payload['models']]
+        self.models = [Model(m['id'], m['name'], self.id) for m in payload['models']]
         return self.models
 
     ####################################################################################################################
@@ -156,7 +183,7 @@ class AI(APIInterface):
 
     def load_channels(self) -> List[Channel]:
         payload = self._get('/channels')
-        self.channels = [Channel(c['id'], c['name'], self.name) for c in payload['channels']]
+        self.channels = [Channel(c['id'], c['name'], self.id) for c in payload['channels']]
         self.channel_interfaces = {c.name: c for c in all_channels if self.has_channel(c.name)}
         return self.channels
 
@@ -164,27 +191,24 @@ class AI(APIInterface):
     # RUNNING
     ####################################################################################################################
 
-    async def handle_healthcheck(self):
+    @staticmethod
+    async def handle_healthcheck():
         return {'healthcheck': 'hello world!'}
 
     async def redirect_dashboard(self):
-        base_url = 'https://devai.retool.com/embedded/public/1c65ff6f-4485-489a-b151-205e635b7f7b'
         return RedirectResponse(
-            url=f'{base_url}#agent_name={self.name}'
+            url=f'{config["admin_url_large"]}#agent_name={self.id.agent_name}'
         )
 
-    async def handle_trigger(self, input: TriggerInput):
-        message = extract_message(input)
+    async def handle_trigger(self, trigger_input: TriggerInput):
+        message = extract_message(trigger_input)
         asyncio.create_task(self.handler(message))
         return {'status': 'success'}
 
-    def start(self, handler, port=8080, channels: List[str] = default_channels, models: List[str] = default_models):
-
-        # =====[ Initialization ]=====
-        app_name = os.environ['PYTHONPATH'].split('/')[3]
-        app_url = f'https://{app_name}.jayhack.repl.co'
-        self.init(app_name, app_url, channels=channels, models=models)
-        print(app_name, app_url)
+    def start(self, handler, port=8081, channels: List[str] = None, models: List[str] = None):
+        """Registers and starts the server"""
+        # =====[ Registration ]=====
+        self.register(channels=channels, models=models)
 
         # =====[ App setup ]=====
         self.app = app
@@ -193,7 +217,21 @@ class AI(APIInterface):
         router.add_api_route('/healthcheck', endpoint=self.handle_healthcheck, methods=['GET'])
         router.add_api_route('/io', endpoint=self.handle_trigger, methods=['POST'])
         self.app.include_router(router)
+        
+        # =====[ Run ]=====
+        logging.info('=====[ App info: ]=====')
+        logging.info(f'user_name: {self.id.user_name}')
+        logging.info(f'agent_name: {self.id.agent_name}')
+        logging.info(f'agent_id: {self.id.agent_id}')
+        logging.info(f'agent_instance_id: {self.id.agent_instance_id}')
         uvicorn.run(self.app, host="0.0.0.0", port=port)
+        
+        # =====[ Print out details ]=====
+        logging.info('Startup complete')
+        logging.info(f'user_name: {self.id.user_name}')
+        logging.info(f'agent_name: {self.id.agent_name}')
+        logging.info(f'agent_id: {self.id.agent_id}')
+        logging.info(f'agent_instance_id: {self.id.agent_instance_id}')
 
 
 ai = AI()

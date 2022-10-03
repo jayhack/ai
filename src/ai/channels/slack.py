@@ -13,7 +13,7 @@ class SlackChannel(ChannelInterface):
 
     def __init__(self, parent):
         self._post = parent._post
-        self.agent_name = parent.name
+        self.agent_name = parent.id.agent_name
 
     def send_message(self, content: Union[dict, str]):
         payload = content if type(content) is dict else {'text': content}

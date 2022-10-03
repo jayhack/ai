@@ -1,17 +1,28 @@
 from .api_interface import APIInterface
 from .config import config
+from ..app_id import AppID
 
 
 class Channel(APIInterface):
+    """
+    API for interacting with channels like Slack, Notion, Github etc.
+
+    Gets inherited by `channels.slack.SlackChannel` etc.
+
+    import ai
+    ai.slack.send_message(text='hello, world!')
+    """
     id: int
     name: str
+    app_id: AppID
     subscription_id: int
     base_url: str
 
-    def __init__(self, id: int, name: str, agent_name: str):
-        self.id = id
+    def __init__(self, channel_id: int, name: str, app_id: AppID):
+        self.id = channel_id
         self.name = name
-        self.base_url = f'{config["server_url"]}/agents/{agent_name}/channels/{id}'
+        base_url = f'{config["server_url"]}/channels/{id}'
+        super(Channel, self).__init__(base_url, app_id)
 
     def __dict__(self):
         return {

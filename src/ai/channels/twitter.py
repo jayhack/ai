@@ -14,9 +14,11 @@ class TwitterChannel(ChannelInterface):
 
     def __init__(self, parent):
         self._post = parent._post
-        self.agent_name = parent.name
+        self.agent_name = parent.id.agent_name
 
-    def reply(self, tweet_id: int, text: str, image_urls: List[str] = []):
+    def reply(self, tweet_id: int, text: str, image_urls: List[str] = None):
+        if image_urls is None:
+            image_urls = []
         json = {
             'agent_name': self.agent_name,
             'channel_name': self.name,
