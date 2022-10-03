@@ -8,4 +8,4 @@ class AppID:
     user_name: str
     agent_name: str
     agent_id: Union[int, None]
-    agent_instance_id: Union[int, None]
+    instance_id: Union[int, None]
