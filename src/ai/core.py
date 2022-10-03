@@ -1,10 +1,10 @@
 import asyncio
 import logging
 import os
+from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Tuple
-from typing import Callable
 from typing import Union
 
 import uvicorn
@@ -207,11 +207,12 @@ class AI(APIInterface):
         asyncio.create_task(self.handler(message))
         return {'status': 'success'}
 
-    def start(self, handler: Callable, on_boot: Union[Callable, None] = None, port=8081, channels: List[str] = None, models: List[str] = None):
+    def start(self, handler: Callable, on_boot: Union[Callable, None] = None, port=8080, channels: List[str] = None,
+              models: List[str] = None):
         """Registers and starts the server"""
         # =====[ Registration ]=====
         self.register(channels=channels, models=models)
-        
+
         # =====[ On Boot ]=====
         if on_boot:
             on_boot()
@@ -223,15 +224,16 @@ class AI(APIInterface):
         router.add_api_route('/healthcheck', endpoint=self.handle_healthcheck, methods=['GET'])
         router.add_api_route('/io', endpoint=self.handle_trigger, methods=['POST'])
         self.app.include_router(router)
-        
+
         # =====[ Run ]=====
         logging.info('=====[ App info: ]=====')
         logging.info(f'user_name: {self.id.user_name}')
         logging.info(f'agent_name: {self.id.agent_name}')
         logging.info(f'agent_id: {self.id.agent_id}')
         logging.info(f'instance_id: {self.id.instance_id}')
+        logging.info(f'app_url: {self.app_url}')
         uvicorn.run(self.app, host="0.0.0.0", port=port)
-        
+
         # =====[ Print out details ]=====
         logging.info('Startup complete')
         logging.info(f'user_name: {self.id.user_name}')
