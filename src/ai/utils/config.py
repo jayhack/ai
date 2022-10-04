@@ -11,4 +11,4 @@ values = {
     }
 }
 
-config = values['prod']
+config = values['local']
