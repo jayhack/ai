@@ -29,7 +29,7 @@ class APIInterface(object):
         response = requests.get(f'{self.base_url}{endpoint}', headers=self.headers)
         return response.json()
 
-    def _post(self, endpoint, data) -> Union[dict, None]:
+    def _post(self, endpoint, data) -> dict:
         response = requests.post(f'{self.base_url}{endpoint}', json=data, headers=self.headers)
         if response.status_code != 200:
             logging.info(f'_post Error: {response.content}')

@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Union
 
 from .channel import Channel
 from ..app_id import AppID
@@ -10,7 +10,10 @@ logging.basicConfig(level=logging.INFO)
 class TwitterChannel(Channel):
     app_id: AppID
 
-    def reply(self, tweet_id: int, text: str, image_urls: List[str] = None):
+    def update_status(self, text: str, image_urls: List[str] = None):
+        return self.reply(None, text, image_urls)
+
+    def reply(self, tweet_id: Union[int, None], text: str, image_urls: List[str] = None):
         if image_urls is None:
             image_urls = []
         json = {
@@ -26,8 +29,4 @@ class TwitterChannel(Channel):
         }
         logging.info(f'[TwitterChannel] Sending message: {json}')
         response = self._post('/message', json)
-        if response is not None:
-            logging.info(f'Successfully sent message: {dict(json["payload"])}')
-        else:
-            logging.info(f'Error: {response}')
         return response

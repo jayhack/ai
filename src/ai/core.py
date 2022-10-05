@@ -52,8 +52,8 @@ def extract_message(t: TriggerInput) -> Message:
 app = FastAPI()
 router = APIRouter()
 
-default_channels: List[Channel] = ['slack', 'twitter']
-default_models: List[Model] = ['openai/gpt-3', 'stability-ai/stable-diffusion']
+default_channels: List[str] = ['Slack', 'Twitter']
+default_models: List[str] = ['openai/gpt-3', 'stability-ai/stable-diffusion']
 
 
 class AI(APIInterface):
@@ -141,7 +141,10 @@ class AI(APIInterface):
         return [c for c in self.channels if c.channel_type == channel_type]
 
     def _get_first_by_type(self, channel_type: ChannelType) -> ChannelUnionType:
-        return self._channel_by_type(channel_type)[0]
+        channels = self._channel_by_type(channel_type)
+        if len(channels) == 0:
+            raise Exception(f'No such channel of type {channel_type}')
+        return channels[0]
 
     @property
     def slack(self) -> SlackChannel:

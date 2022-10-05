@@ -23,9 +23,4 @@ class SlackChannel(Channel):
         }
         logging.info(f'[SlackChannel] Sending message: {json}')
         response = self._post('/message', json)
-        if response is not None:
-            logging.info(f'Successfully sent message: {dict(payload)}')
-        else:
-            logging.info(f'')
-            print(f'Error: {response}')
         return response
