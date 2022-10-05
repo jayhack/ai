@@ -1,9 +1,9 @@
 import logging
-from dataclasses import dataclass
 from typing import Union
-from ..app_id import AppID
 
 import requests
+
+from ..app_id import AppID
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -15,14 +15,14 @@ class APIInterface(object):
     def __init__(self, base_url: str, app_id: AppID):
         self.base_url = base_url
         self.id = app_id
-        
+
     @property
     def headers(self) -> dict:
         return {
-            'user_name': self.id.user_name,
-            'agent_name': self.id.agent_name,
-            'agent_id': str(self.id.agent_id),
-            'instance_id': str(self.id.instance_id),
+            'user-name': self.id.user_name,
+            'agent-name': self.id.agent_name,
+            'agent-id': str(self.id.agent_id),
+            'instance-id': str(self.id.instance_id),
         }
 
     def _get(self, endpoint: str) -> Union[dict, None]:

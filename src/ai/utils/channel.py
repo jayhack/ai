@@ -15,12 +15,16 @@ class Channel(APIInterface):
     id: int
     name: str
     app_id: AppID
+    channel_type: str
+    cdata: dict
     subscription_id: int
     base_url: str
 
-    def __init__(self, channel_id: int, name: str, app_id: AppID):
+    def __init__(self, channel_id: int, name: str, channel_type: str, cdata: dict, app_id: AppID):
         self.id = channel_id
         self.name = name
+        self.channel_type = channel_type
+        self.cdata = cdata
         base_url = f'{config["server_url"]}/channels/{id}'
         super(Channel, self).__init__(base_url, app_id)
 

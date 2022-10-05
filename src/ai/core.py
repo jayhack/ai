@@ -95,7 +95,8 @@ class AI(APIInterface):
             user_name=user_name,
             agent_name=app_name,
             agent_id=None,
-            instance_id=None
+            instance_id=None,
+            creds=None
         )
         super(AI, self).__init__(self.base_url, self.id)
 
@@ -119,8 +120,9 @@ class AI(APIInterface):
                 logging.info(f'Registered returning agent: {self.id.agent_name}')
         self.id.agent_id = data['agent']['id']
         self.id.instance_id = data['instance']['id']
+        self.id.creds = data['channels']
         self.models = [Model(m['id'], m['name'], self.id) for m in data['models']]
-        self.channels = [Channel(c['id'], c['name'], self.id) for c in data['channels']]
+        self.channels = [Channel(c['id'], c['name'], c['channel_type'], c, self.id) for c in data['channels']]
         self.channel_interfaces = {c.name: c(self) for c in all_channels if self.has_channel(c.name)}
 
     ####################################################################################################################
