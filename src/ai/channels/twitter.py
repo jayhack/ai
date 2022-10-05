@@ -1,26 +1,20 @@
 import logging
 from typing import List
 
+from .channel import Channel
+from ..app_id import AppID
+
 logging.basicConfig(level=logging.INFO)
 
 
-class ChannelInterface(object):
-    pass
-
-
-class TwitterChannel(ChannelInterface):
-    id = 2
-    name = 'twitter'
-
-    def __init__(self, parent):
-        self._post = parent._post
-        self.agent_name = parent.id.agent_name
+class TwitterChannel(Channel):
+    app_id: AppID
 
     def reply(self, tweet_id: int, text: str, image_urls: List[str] = None):
         if image_urls is None:
             image_urls = []
         json = {
-            'agent_name': self.agent_name,
+            'agent_name': self.app_id.agent_name,
             'channel_name': self.name,
             'channel_id': self.id,
             'channel': {'id': self.id, 'name': self.name},

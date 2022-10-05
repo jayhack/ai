@@ -1,6 +1,10 @@
-from .api_interface import APIInterface
-from .config import config
+from typing import Union
+
 from ..app_id import AppID
+from ..utils.api_interface import APIInterface
+from ..utils.config import config
+
+ChannelType = Union['Slack', 'Twitter', 'GitHub', 'Airtable']
 
 
 class Channel(APIInterface):
@@ -15,17 +19,17 @@ class Channel(APIInterface):
     id: int
     name: str
     app_id: AppID
-    channel_type: str
+    channel_type: ChannelType
     cdata: dict
     subscription_id: int
     base_url: str
 
-    def __init__(self, channel_id: int, name: str, channel_type: str, cdata: dict, app_id: AppID):
-        self.id = channel_id
-        self.name = name
-        self.channel_type = channel_type
+    def __init__(self, app_id: AppID, cdata: dict):
+        self.id = cdata['id']
+        self.name = cdata['name']
+        self.channel_type = cdata['channel_type']
         self.cdata = cdata
-        base_url = f'{config["server_url"]}/channels/{id}'
+        base_url = f'{config["server_url"]}/agents/channel'
         super(Channel, self).__init__(base_url, app_id)
 
     def __dict__(self):
@@ -33,3 +37,6 @@ class Channel(APIInterface):
             'id': self.id,
             'name': self.name
         }
+
+    def __str__(self):
+        return f'<Channel: name={self.name} type={self.channel_type} id={self.id}>'

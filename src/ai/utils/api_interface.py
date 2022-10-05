@@ -9,20 +9,20 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 class APIInterface(object):
-    id: AppID
+    app_id: AppID
     base_url: str
 
     def __init__(self, base_url: str, app_id: AppID):
         self.base_url = base_url
-        self.id = app_id
+        self.app_id = app_id
 
     @property
     def headers(self) -> dict:
         return {
-            'user-name': self.id.user_name,
-            'agent-name': self.id.agent_name,
-            'agent-id': str(self.id.agent_id),
-            'instance-id': str(self.id.instance_id),
+            'user-name': self.app_id.user_name,
+            'agent-name': self.app_id.agent_name,
+            'agent-id': str(self.app_id.agent_id),
+            'instance-id': str(self.app_id.instance_id),
         }
 
     def _get(self, endpoint: str) -> Union[dict, None]:

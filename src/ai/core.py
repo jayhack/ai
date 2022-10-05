@@ -14,20 +14,18 @@ from pydantic import BaseModel
 from starlette.responses import RedirectResponse
 
 from .app_id import AppID
-from .channels.airtable import api as airtable_api
-from .channels.gh import g
-# from .channels.notion import notion_api
-from .channels.slack import ChannelInterface, SlackChannel
+from .channels.airtable import AirtableChannel
+from .channels.channel import Channel, ChannelType
+from .channels.create_channel import create_channel, ChannelUnionType
+from .channels.gh import GithubChannel
+from .channels.slack import SlackChannel
 from .channels.twitter import TwitterChannel
 from .utils.api_interface import APIInterface
-from .utils.channel import Channel
 from .utils.config import config
 from .utils.message import Message
 from .utils.model import Model
 
 logging.basicConfig(level=logging.INFO)
-
-all_channels = [SlackChannel, TwitterChannel]
 
 
 class ChannelInput(BaseModel):
@@ -59,14 +57,12 @@ default_models: List[Model] = ['openai/gpt-3', 'stability-ai/stable-diffusion']
 
 
 class AI(APIInterface):
-    """Main interface"""
     id: AppID
     app_url: str
     base_url = config['server_url']
     app = None
     handler = None
-    channels: List[Channel]
-    channel_interfaces: Dict[str, ChannelInterface]
+    channels: List[ChannelUnionType]
     models: List[Model]
 
     ####################################################################################################################
@@ -102,14 +98,14 @@ class AI(APIInterface):
 
     def register(self, channels: List[str], models: List[str]):
         """Announces presence of this agent to the server"""
-        self.channels = channels or default_channels
-        self.models = models or default_models
+        use_channels = channels or default_channels
+        use_models = models or default_models
         data = self._post(f'/register', {
             'app_name': self.id.agent_name,
             'user_name': self.id.user_name,
             'url': self.app_url,
-            'channels': self.channels,
-            'models': self.models
+            'channels': use_channels,
+            'models': use_models
         })
         if not data:
             raise Exception('Could not establish connection to server')
@@ -122,36 +118,57 @@ class AI(APIInterface):
         self.id.instance_id = data['instance']['id']
         self.id.creds = data['channels']
         self.models = [Model(m['id'], m['name'], self.id) for m in data['models']]
-        self.channels = [Channel(c['id'], c['name'], c['channel_type'], c, self.id) for c in data['channels']]
-        self.channel_interfaces = {c.name: c(self) for c in all_channels if self.has_channel(c.name)}
+        self.channels = [create_channel(self.id, c) for c in data['channels']]
 
     ####################################################################################################################
     # CHANNELS
     ####################################################################################################################
+    """
+    Should support an API like so:
+    ai.twitter.send_message(text)
+    ai.get_channel(channel_name).send_message(text) # accounts for multiple twitter accounts
+    
+    So really these should be returning a Channel object. Can we make the API interfaces subclass Channel?
+    """
+
+    def _channel_by_name(self, channel_name: str) -> Channel:
+        channels = [c for c in self.channels if c.name == channel_name]
+        if len(channels) == 0:
+            raise Exception(f'No such channel: {channel_name}')
+        return channels[0]
+
+    def _channel_by_type(self, channel_type: str) -> List[ChannelUnionType]:
+        return [c for c in self.channels if c.channel_type == channel_type]
+
+    def _get_first_by_type(self, channel_type: ChannelType) -> ChannelUnionType:
+        return self._channel_by_type(channel_type)[0]
 
     @property
-    def slack(self):
-        return self.channel_interfaces['slack']
+    def slack(self) -> SlackChannel:
+        c: SlackChannel = self._get_first_by_type('Slack')
+        return c
 
     @property
-    def github(self):
-        return self.channel_interfaces['github']
+    def github(self) -> GithubChannel:
+        c: GithubChannel = self._get_first_by_type('GitHub')
+        return c
 
     @property
-    def twitter(self):
-        return self.channel_interfaces['twitter']
+    def twitter(self) -> TwitterChannel:
+        c: TwitterChannel = self._get_first_by_type('Twitter')
+        return c
 
     @property
-    def github_api(self):
-        return g
-
-    # @property
-    # def notion_api(self):
-    #     return notion_api
+    def airtable(self):
+        c: AirtableChannel = self._get_first_by_type('Airtable')
+        return c
 
     @property
-    def airtable_api(self):
-        return airtable_api
+    def notion(self):
+        raise NotImplementedError
+
+    def get_channel(self, channel_name: str):
+        return self._channel_by_name(channel_name)
 
     ####################################################################################################################
     # MODELS
@@ -184,12 +201,6 @@ class AI(APIInterface):
 
     def has_channel(self, name: str) -> bool:
         return len([c for c in self.channels if c.name == name]) > 0
-
-    def load_channels(self) -> List[Channel]:
-        payload = self._get('/channels')
-        self.channels = [Channel(c['id'], c['name'], self.id) for c in payload['channels']]
-        self.channel_interfaces = {c.name: c for c in all_channels if self.has_channel(c.name)}
-        return self.channels
 
     ####################################################################################################################
     # RUNNING
