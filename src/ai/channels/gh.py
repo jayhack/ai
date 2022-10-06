@@ -36,3 +36,10 @@ class GithubChannel(Channel):
             logging.info(f'')
             print(f'Error: {response}')
         return response
+
+    @property
+    def api(self):
+        key = self.get_credential('API_KEY')
+        if not key:
+            raise Exception('Github API key not found')
+        return Github(key)

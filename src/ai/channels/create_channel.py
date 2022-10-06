@@ -16,7 +16,7 @@ def create_channel(app_id: AppID, cdict: dict) -> ChannelUnionType:
         return SlackChannel(app_id, cdict)
     elif channel_type == 'Twitter':
         return TwitterChannel(app_id, cdict)
-    elif channel_type == 'Github':
+    elif channel_type == 'GitHub':
         return GithubChannel(app_id, cdict)
     elif channel_type == 'Airtable':
         return AirtableChannel(app_id, cdict)

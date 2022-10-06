@@ -7,9 +7,6 @@ from ..app_id import AppID
 
 logging.basicConfig(level=logging.INFO)
 
-AIRTABLE_API_KEY = 'keygxE02sLmHSebja'
-api = Api(AIRTABLE_API_KEY)
-
 
 class AirtableChannel(Channel):
     app_id: AppID
@@ -19,5 +16,7 @@ class AirtableChannel(Channel):
 
     @property
     def api(self):
-        AIRTABLE_API_KEY = self.get_credential('API_KEY')
-        return Api(AIRTABLE_API_KEY)
+        key = self.get_credential('API_KEY')
+        if not key:
+            raise Exception('Airtable API key not found')
+        return Api(key)
