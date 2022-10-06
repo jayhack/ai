@@ -78,7 +78,7 @@ class AI(APIInterface):
     def get_app_metadata(cls) -> Tuple[str, str, str]:
         """Assumes Replit"""
         if cls.is_local_dev():
-            return 'demo-agent', 'demo-user', 'http://localhost:8081'
+            return 'demo-agent-2', 'demo-user', 'http://localhost:8081'
         app_name = os.environ['PYTHONPATH'].split('/')[3]
         user_name = os.environ['REPL_OWNER']
         app_url = f'https://{app_name}.{user_name}.repl.co'

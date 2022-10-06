@@ -10,13 +10,14 @@ src/ai.egg-info/dependency_links.txt
 src/ai.egg-info/top_level.txt
 src/ai/channels/__init__.py
 src/ai/channels/airtable.py
+src/ai/channels/channel.py
+src/ai/channels/create_channel.py
 src/ai/channels/gh.py
 src/ai/channels/notion.py
 src/ai/channels/slack.py
 src/ai/channels/twitter.py
 src/ai/utils/__init__.py
 src/ai/utils/api_interface.py
-src/ai/utils/channel.py
 src/ai/utils/config.py
 src/ai/utils/custom_types.py
 src/ai/utils/message.py
