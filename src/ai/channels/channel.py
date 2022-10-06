@@ -32,6 +32,10 @@ class Channel(APIInterface):
         base_url = f'{config["server_url"]}/agents/channel'
         super(Channel, self).__init__(base_url, app_id)
 
+    def get_credential(self, cred_name: str):
+        all_creds = {x['key']: x['value'] for x in self.cdata['credentials']}
+        return all_creds.get(cred_name, None)
+
     def __dict__(self):
         return {
             'id': self.id,

@@ -134,7 +134,7 @@ class AI(APIInterface):
     def _channel_by_name(self, channel_name: str) -> Channel:
         channels = [c for c in self.channels if c.name == channel_name]
         if len(channels) == 0:
-            raise Exception(f'No such channel: {channel_name}')
+            raise Exception(f'No such channel {channel_name}; Try registering a channel of this type')
         return channels[0]
 
     def _channel_by_type(self, channel_type: str) -> List[ChannelUnionType]:
@@ -143,7 +143,7 @@ class AI(APIInterface):
     def _get_first_by_type(self, channel_type: ChannelType) -> ChannelUnionType:
         channels = self._channel_by_type(channel_type)
         if len(channels) == 0:
-            raise Exception(f'No such channel of type {channel_type}')
+            raise Exception(f'No such channel of type {channel_type}; Try registering a channel of this type')
         return channels[0]
 
     @property

@@ -16,3 +16,8 @@ class AirtableChannel(Channel):
 
     def send_message(self, payload):
         raise NotImplementedError
+
+    @property
+    def api(self):
+        AIRTABLE_API_KEY = self.get_credential('API_KEY')
+        return Api(AIRTABLE_API_KEY)
