@@ -21,7 +21,7 @@ from .channels.gh import GithubChannel
 from .channels.slack import SlackChannel
 from .channels.twitter import TwitterChannel
 from .utils.api_interface import APIInterface
-from .utils.config import config
+from .utils.config import config, is_local_dev
 from .utils.message import Message
 from .utils.model import Model
 
@@ -72,7 +72,7 @@ class AI(APIInterface):
     @classmethod
     def is_local_dev(cls):
         """Used for development; returns True if this is not on Replit"""
-        return 'REPL_OWNER' not in os.environ
+        return is_local_dev()
 
     @classmethod
     def get_app_metadata(cls) -> Tuple[str, str, str]:

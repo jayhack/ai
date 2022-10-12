@@ -1,3 +1,8 @@
+import os
+
+def is_local_dev():
+    return 'REPL_OWNER' not in os.environ
+
 values = {
     'prod': {
         'server_url': 'https://dev-backend.fly.dev',
@@ -11,4 +16,4 @@ values = {
     }
 }
 
-config = values['local']
+config = values['local'] if is_local_dev() else values['prod']
