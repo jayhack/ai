@@ -37,7 +37,6 @@ class TriggerInput(BaseModel):
     id: int
     timestamp: str
     channel: ChannelInput
-    producer_id: int
     body: Dict
 
 
