@@ -3,6 +3,7 @@ from typing import List, Union
 
 from .channel import Channel
 from ..app_id import AppID
+from .api_client_wrapper import APIClientWrapper
 import tweepy
 
 logging.basicConfig(level=logging.INFO)
@@ -19,10 +20,11 @@ class TwitterChannel(Channel):
     _api = None
     
     @property
-    def api(self) -> tweepy.API:
+    def api(self) -> APIClientWrapper:
         if not self._api:
-            self._api = authenticate(self.get_credential('API_KEY'), self.get_credential('API_KEY_SECRET'), self.get_credential('ACCESS_TOKEN'), self.get_credential('ACCESS_TOKEN_SECRET'))
-        return self._api
+            self._api = authenticate(self.get_credential('API_KEY'), self.get_credential('API_KEY_SECRET'),
+                                     self.get_credential('ACCESS_TOKEN'), self.get_credential('ACCESS_TOKEN_SECRET'))
+        return APIClientWrapper(self._api, self._post)
 
     def update_status(self, text: str, image_urls: List[str] = None):
         return self.reply(None, text, image_urls)
