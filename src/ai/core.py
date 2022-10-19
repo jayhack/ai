@@ -52,7 +52,7 @@ app = FastAPI()
 router = APIRouter()
 
 default_channels: List[str] = ['Slack', 'Twitter']
-default_models: List[str] = ['openai/gpt-3', 'stability-ai/stable-diffusion', 'play.ht']
+default_models: List[str] = ['openai/gpt-3', 'stability-ai/stable-diffusion', 'play.ht', 'assembly.ai']
 
 
 class AI(APIInterface):
