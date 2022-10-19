@@ -10,6 +10,7 @@ src/ai.egg-info/dependency_links.txt
 src/ai.egg-info/top_level.txt
 src/ai/channels/__init__.py
 src/ai/channels/airtable.py
+src/ai/channels/api_client_wrapper.py
 src/ai/channels/channel.py
 src/ai/channels/create_channel.py
 src/ai/channels/gh.py
