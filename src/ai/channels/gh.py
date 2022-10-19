@@ -4,6 +4,7 @@ from github import Github
 
 from .channel import Channel
 from ..app_id import AppID
+from .api_client_wrapper import APIClientWrapper
 
 logging.basicConfig(level=logging.INFO)
 
@@ -19,6 +20,7 @@ def get_repos():
 
 class GithubChannel(Channel):
     app_id: AppID
+    _api: any = None
 
     def send_message(self, payload):
         json = {
@@ -42,4 +44,8 @@ class GithubChannel(Channel):
         key = self.get_credential('API_KEY')
         if not key:
             raise Exception('Github API key not found')
-        return Github(key)
+        if not self._api:
+            self._api = Github(key)
+        return APIClientWrapper(self._api, self._post)
+    
+        

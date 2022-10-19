@@ -15,5 +15,5 @@ class APIClientWrapper(object):
                 'args': args,
                 'kwargs': kwargs
             })
-            self.api.__getattribute__(item)(*args, **kwargs)
+            return self.api.__getattribute__(item)(*args, **kwargs)
         return writer_func
