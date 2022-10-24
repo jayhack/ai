@@ -2,15 +2,11 @@ import logging
 
 from github import Github
 
+from .api_client_wrapper import APIClientWrapper
 from .channel import Channel
 from ..app_id import AppID
-from .api_client_wrapper import APIClientWrapper
 
 logging.basicConfig(level=logging.INFO)
-
-first_half = '99fwfMz1QwGfC'
-second_half = 'TPDz5dqts5s7embxy3DnEWX'
-g = Github(f'ghp_{first_half}{second_half}')
 
 
 def get_repos():
@@ -47,5 +43,3 @@ class GithubChannel(Channel):
         if not self._api:
             self._api = Github(key)
         return APIClientWrapper(self._api, self._post)
-    
-        

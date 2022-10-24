@@ -51,7 +51,7 @@ def extract_message(t: TriggerInput) -> Message:
 app = FastAPI()
 router = APIRouter()
 
-default_channels: List[str] = ['Slack', 'Twitter']
+default_channels: List[str] = []
 default_models: List[str] = ['openai/gpt-3', 'stability-ai/stable-diffusion', 'play.ht', 'assembly.ai']
 
 
@@ -77,7 +77,7 @@ class AI(APIInterface):
     def get_app_metadata(cls) -> Tuple[str, str, str]:
         """Assumes Replit"""
         if cls.is_local_dev():
-            return 'demo-agent-2', 'demo-user', 'http://localhost:8081'
+            return 'gp-tutor', 'jayhack', 'http://localhost:8081'
         app_name = os.environ['PYTHONPATH'].split('/')[3]
         user_name = os.environ['REPL_OWNER']
         app_url = f'https://{app_name}.{user_name}.repl.co'
@@ -94,6 +94,7 @@ class AI(APIInterface):
             creds=None
         )
         super(AI, self).__init__(self.base_url, self.id)
+        self.app = app
 
     def register(self, channels: List[str], models: List[str]):
         """Announces presence of this agent to the server"""
@@ -172,6 +173,12 @@ class AI(APIInterface):
     def get_channel(self, channel_name: str):
         return self._channel_by_name(channel_name)
 
+    def get_channels(self) -> List[Channel]:
+        return self.channels
+
+    def has_channel(self, name: str) -> bool:
+        return len([c for c in self.channels if c.name == name]) > 0
+
     ####################################################################################################################
     # MODELS
     ####################################################################################################################
@@ -190,27 +197,18 @@ class AI(APIInterface):
         return self.models
 
     ####################################################################################################################
-    # CHANNELS
-    ####################################################################################################################
-
-    def get_channel(self, name: str) -> Channel:
-        if name not in [c.name for c in self.channels]:
-            raise Exception(f'No such channel: {name}')
-        return [c for c in self.channels if c.name == name][0]
-
-    def get_channels(self) -> List[Channel]:
-        return self.channels
-
-    def has_channel(self, name: str) -> bool:
-        return len([c for c in self.channels if c.name == name]) > 0
-
-    ####################################################################################################################
-    # RUNNING
+    #
     ####################################################################################################################
 
     @staticmethod
     async def handle_healthcheck():
         return {'healthcheck': 'hello world!'}
+
+    def get_dashboard_embedded(self) -> str:
+        return f'{config["admin_url_large"]}#agent_name={self.id.agent_name}'
+
+    def get_dashboard(self) -> str:
+        return config['dashboard_url'].format(agent_name=self.id.agent_name, username=self.id.user_name)
 
     async def redirect_dashboard(self):
         return RedirectResponse(
@@ -218,11 +216,13 @@ class AI(APIInterface):
         )
 
     async def handle_trigger(self, trigger_input: TriggerInput):
-        message = extract_message(trigger_input)
-        asyncio.create_task(self.handler(message))
+        if self.handler:
+            message = extract_message(trigger_input)
+            asyncio.create_task(self.handler(message))
         return {'status': 'success'}
 
-    def start(self, handler: Callable, on_boot: Union[Callable, None] = None, port=8080, channels: List[str] = None,
+    def start(self, handler: Union[Callable, None] = None, on_boot: Union[Callable, None] = None, port=8080,
+              channels: List[str] = None,
               models: List[str] = None):
         """Registers and starts the server"""
         # =====[ Registration ]=====
@@ -247,6 +247,7 @@ class AI(APIInterface):
         logging.info(f'agent_id: {self.id.agent_id}')
         logging.info(f'instance_id: {self.id.instance_id}')
         logging.info(f'app_url: {self.app_url}')
+        logging.info(f'dashboard: {self.get_dashboard()}')
         uvicorn.run(self.app, host="0.0.0.0", port=port)
 
         # =====[ Print out details ]=====
