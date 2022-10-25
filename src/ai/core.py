@@ -91,9 +91,10 @@ class AI(APIInterface):
     def get_app_metadata(cls) -> Tuple[str, str, str]:
         """Assumes Replit"""
         if cls.is_local_dev():
-            return 'gp-tutor', 'jayhack', 'http://localhost:8081'
+            return 'gp-tutor', 'jayhack', 'https://gp-tutor-backend.fly.dev'
+            # return 'gp-tutor', 'jayhack', 'http://localhost:8081'
         app_name = os.environ['PYTHONPATH'].split('/')[3]
-        user_name = os.environ['REPL_OWNER']
+        user_name = os.environ.get('REPL_OWNER', 'jayhack')
         app_url = f'https://{app_name}.{user_name}.repl.co'
         return app_name, user_name, app_url
 
