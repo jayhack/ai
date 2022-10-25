@@ -236,6 +236,15 @@ class AI(APIInterface):
             asyncio.create_task(self.handler(message))
         return {'status': 'success'}
 
+    def setup(self):
+        self.register(channels=[], models=[])
+        self.app = app
+        router.add_api_route('/', endpoint=self.redirect_dashboard, methods=['GET'])
+        router.add_api_route('/healthcheck', endpoint=self.handle_healthcheck, methods=['GET'])
+        router.add_api_route('/io', endpoint=self.handle_trigger, methods=['POST'])
+        self.app.include_router(router)
+        return self.app
+
     def start(self, handler: Union[Callable, None] = None, on_boot: Union[Callable, None] = None, port=8080,
               channels: List[str] = None,
               models: List[str] = None):
