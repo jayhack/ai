@@ -30,6 +30,7 @@ class APIInterface(object):
         return response.json()
 
     def _post(self, endpoint, data) -> dict:
+        print(self.base_url)
         response = requests.post(f'{self.base_url}{endpoint}', json=data, headers=self.headers)
         if response.status_code != 200:
             logging.info(f'_post Error: {response.content}')
