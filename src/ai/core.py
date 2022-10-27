@@ -231,13 +231,25 @@ class AI(APIInterface):
             url=f'{config["admin_url_large"]}#agent_name={self.id.agent_name}'
         )
 
+    async def redirect_dashboard_large(self):
+        return RedirectResponse(
+            url=config["dashboard_url"].format(username=self.id.user_name, agent_name=self.id.agent_name)
+        )
+
     async def handle_trigger(self, trigger_input: TriggerInput):
         if self.handler:
             message = extract_message(trigger_input)
             asyncio.create_task(self.handler(message))
         return {'status': 'success'}
 
-    def setup(self):
+    def setup(self, name='default'):
+        self.id = AppID(
+            user_name='jayhack',
+            agent_name=name,
+            agent_id=None,
+            instance_id=None,
+            creds=None
+        )
         self.register(channels=[], models=[])
         self.app = app
         router.add_api_route('/', endpoint=self.redirect_dashboard, methods=['GET'])
@@ -261,6 +273,7 @@ class AI(APIInterface):
         self.app = app
         self.handler = handler
         router.add_api_route('/', endpoint=self.redirect_dashboard, methods=['GET'])
+        router.add_api_route('/dashboard', endpoint=self.redirect_dashboard_large, methods=['POST'])
         router.add_api_route('/healthcheck', endpoint=self.handle_healthcheck, methods=['GET'])
         router.add_api_route('/io', endpoint=self.handle_trigger, methods=['POST'])
         self.app.include_router(router)
