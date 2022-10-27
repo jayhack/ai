@@ -54,7 +54,8 @@ app = FastAPI()
 origins = [
     "http://localhost:3000",
     "https://*.jay.ai",
-    "https://gp-tutor.jay.ai"
+    "https://gp-tutor.jay.ai",
+    "https://music.jay.ai",
 ]
 
 app.add_middleware(

@@ -18,5 +18,5 @@ values = {
     }
 }
 
-config = values['local'] if is_local_dev() else values['prod']
-# config = values['prod']
+# config = values['local'] if is_local_dev() else values['prod']
+config = values['prod']
