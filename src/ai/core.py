@@ -1,13 +1,11 @@
 import asyncio
 import logging
-import os
 from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Tuple
 from typing import Union
 
-import uvicorn
 from fastapi import APIRouter
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,8 +19,9 @@ from .channels.create_channel import create_channel, ChannelUnionType
 from .channels.gh import GithubChannel
 from .channels.slack import SlackChannel
 from .channels.twitter import TwitterChannel
+from .get_env import get_env
 from .utils.api_interface import APIInterface
-from .utils.config import config, is_local_dev
+from .utils.config import config
 from .utils.message import Message
 from .utils.model import Model
 
@@ -85,20 +84,10 @@ class AI(APIInterface):
     ####################################################################################################################
 
     @classmethod
-    def is_local_dev(cls):
-        """Used for development; returns True if this is not on Replit"""
-        return is_local_dev()
-
-    @classmethod
     def get_app_metadata(cls) -> Tuple[str, str, str]:
         """Assumes Replit"""
-        if cls.is_local_dev():
-            return 'gp-tutor', 'jayhack', 'https://gp-tutor-backend.fly.dev'
-            # return 'gp-tutor', 'jayhack', 'http://localhost:8081'
-        app_name = os.environ['PYTHONPATH'].split('/')[3]
-        user_name = os.environ.get('REPL_OWNER', 'jayhack')
-        app_url = f'https://{app_name}.{user_name}.repl.co'
-        return app_name, user_name, app_url
+        env = get_env()
+        return env.agent_name, env.user_name, env.app_url
 
     def __init__(self):
         app_name, user_name, self.app_url = self.get_app_metadata()
@@ -110,11 +99,14 @@ class AI(APIInterface):
             instance_id=None,
             creds=None
         )
-        super(AI, self).__init__(self.base_url, self.id)
+        super(AI, self).__init__(self.id, self.base_url)
         self.app = app
 
     def register(self, channels: List[str], models: List[str]):
         """Announces presence of this agent to the server"""
+        print('Registering agent...')
+        print(self.id.agent_name)
+        print(self.id.user_name)
         use_channels = channels or default_channels
         use_models = models or default_models
         data = self._post(f'/register', {
@@ -131,6 +123,7 @@ class AI(APIInterface):
                 logging.info(f'Registered new agent: {self.id.agent_name}')
             else:
                 logging.info(f'Registered returning agent: {self.id.agent_name}')
+                print(data)
         self.id.agent_id = data['agent']['id']
         self.id.instance_id = data['instance']['id']
         self.id.creds = data['channels']
@@ -244,14 +237,6 @@ class AI(APIInterface):
         return {'status': 'success'}
 
     def setup(self, name='default'):
-        self.id = AppID(
-            user_name='jayhack',
-            agent_name=name,
-            agent_id=None,
-            instance_id=None,
-            creds=None
-        )
-        self.register(channels=[], models=[])
         self.app = app
         router.add_api_route('/', endpoint=self.redirect_dashboard, methods=['GET'])
         router.add_api_route('/healthcheck', endpoint=self.handle_healthcheck, methods=['GET'])
@@ -263,9 +248,6 @@ class AI(APIInterface):
               channels: List[str] = None,
               models: List[str] = None):
         """Registers and starts the server"""
-        # =====[ Registration ]=====
-        self.register(channels=channels, models=models)
-
         # =====[ On Boot ]=====
         if on_boot:
             on_boot()
@@ -287,7 +269,7 @@ class AI(APIInterface):
         logging.info(f'instance_id: {self.id.instance_id}')
         logging.info(f'app_url: {self.app_url}')
         logging.info(f'dashboard: {self.get_dashboard()}')
-        uvicorn.run(self.app, host="0.0.0.0", port=port)
+        # uvicorn.run(self.app, host="0.0.0.0", port=port)
 
         # =====[ Print out details ]=====
         logging.info('Startup complete')
@@ -295,6 +277,7 @@ class AI(APIInterface):
         logging.info(f'agent_name: {self.id.agent_name}')
         logging.info(f'agent_id: {self.id.agent_id}')
         logging.info(f'instance_id: {self.id.instance_id}')
+        return self.app
 
 
 ai = AI()

@@ -9,14 +9,6 @@ ChannelType = Union['Slack', 'Twitter', 'GitHub', 'Airtable']
 
 
 class Channel(APIInterface):
-    """
-    API for interacting with channels like Slack, Notion, Github etc.
-
-    Gets inherited by `channels.slack.SlackChannel` etc.
-
-    import ai
-    ai.slack.send_message(text='hello, world!')
-    """
     id: int
     name: str
     app_id: AppID
@@ -32,7 +24,7 @@ class Channel(APIInterface):
         self.channel_type = cdata['channel_type']
         self.cdata = cdata
         base_url = f'{config["server_url"]}/agents/channel'
-        super(Channel, self).__init__(base_url, app_id)
+        super(Channel, self).__init__(app_id, base_url)
 
     def authenticate(self):
         """returns an API object"""

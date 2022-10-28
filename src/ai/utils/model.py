@@ -16,7 +16,7 @@ class Model(APIInterface):
         self.name = name
         self.app_id = app_id
         base_url = f"{config['server_url']}/agents/models"
-        super(Model, self).__init__(base_url, app_id)
+        super(Model, self).__init__(app_id, base_url)
 
     def query(self, raw_query: Any, use_active_prompt=False, prompt_id=None) -> dict:
         """TODO: Clean this up, better define ModelQuery relations etc."""
