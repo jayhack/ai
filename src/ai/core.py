@@ -248,6 +248,7 @@ class AI(APIInterface):
               channels: List[str] = None,
               models: List[str] = None):
         """Registers and starts the server"""
+        self.register(channels=channels, models=models)
         # =====[ On Boot ]=====
         if on_boot:
             on_boot()
