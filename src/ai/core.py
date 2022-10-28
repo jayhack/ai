@@ -54,6 +54,8 @@ origins = [
     "http://localhost:3000",
     "https://*.jay.ai",
     "https://gp-tutor.jay.ai",
+    'https://*.fly.dev',
+    'https://llmusic-backend.fly.dev',
     "https://music.jay.ai",
 ]
 
