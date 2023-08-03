@@ -1,3 +1,3 @@
-goodbye world
+goodnight, world
 # ai
 client library for dev app!
