@@ -1,3 +1,3 @@
 # ai
-Hello, world
+goodbye world
 client library for dev app!
