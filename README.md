@@ -1,2 +1,2 @@
 # ai
-client library for dev app!
+client library for dev app
