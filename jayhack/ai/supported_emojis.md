@@ -1,0 +1,2 @@
+supported emojis
+🌈 Rainbow
